@@ -42,7 +42,15 @@ defmodule Soap.Decode do
     convert_data(Xmlel.get_attr(xmlel, "type", "string"), data)
   end
 
-  defp to_map(%Xmlel{name: "item", children: children}), do: Enum.map(children, &to_map/1)
+  defp to_map(%Xmlel{name: "item", children: children}) do
+    values = Enum.map(children, &to_map/1)
+
+    if Enum.all?(values, &is_tuple/1) do
+      Map.new(values)
+    else
+      values
+    end
+  end
 
   defp to_map(%Xmlel{name: name, children: [data]} = xmlel) when is_binary(data) do
     {name, convert_data(Xmlel.get_attr(xmlel, "type", "string"), data)}

@@ -58,6 +58,37 @@ defmodule Soap.DecodeTest do
            } == Soap.Decode.decode(envelope)
   end
 
+  test "decode custom complex response" do
+    envelope = ~s|<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
+                            xmlns:ns1="urn:DRS"
+                            xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/"
+                            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                            SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+          <SOAP-ENV:Body>
+            <ns1:domainCheckResponse>
+              <domainCheckResponseReturn SOAP-ENC:arrayType="ns1:StructDomainCheckResponse[1]" xsi:type="ns1:ArrayStructDomainCheckResponse">
+                <item xsi:type="ns1:StructDomainCheckResponse">
+                  <domain xsi:type="xsd:string">altenwald.se</domain>
+                  <result xsi:type="xsd:string">AVAILABLE</result>
+                  <reason xsi:type="xsd:string"></reason>
+                </item>
+              </domainCheckResponseReturn>
+            </ns1:domainCheckResponse>
+          </SOAP-ENV:Body>
+        </SOAP-ENV:Envelope>|
+
+    assert %{
+             "domainCheckResponseReturn" => [
+               %{
+                 "domain" => "altenwald.se",
+                 "result" => "AVAILABLE",
+                 "reason" => ""
+               }
+             ]
+           } == Soap.Decode.decode(envelope)
+  end
+
   test "decode item list response" do
     envelope = ~s|<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
                             xmlns:ns1="urn:DRS"
