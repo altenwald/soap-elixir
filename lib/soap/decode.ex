@@ -1,4 +1,8 @@
 defmodule Soap.Decode do
+  @moduledoc """
+  Decode a SOAP response from a server. It's performing the conversion of the
+  response and applying types.
+  """
   require Logger
   alias Proximal.Xmlel
 
@@ -8,25 +12,31 @@ defmodule Soap.Decode do
     Map.new(response.children, &to_map/1)
   end
 
-  defp convert_data(attr_type, data) do
-    case get_type(attr_type) do
-      :string -> data
-      :boolean ->
-        case String.downcase(data) do
-          "true" -> true
-          "false" -> false
-          "1" -> true
-          "0" -> false
-        end
-      :integer -> String.to_integer(data)
-      :float -> String.to_float(data)
-      :decimal -> Decimal.new(data)
-      :uri -> URI.parse(data)
-      :datetime ->
-        {:ok, datetime, _offset} = DateTime.from_iso8601(data)
-        datetime
+  defp convert_data({:type, :string}, data), do: data
+
+  defp convert_data({:type, :boolean}, data) do
+    case String.downcase(data) do
+      "true" -> true
+      "false" -> false
+      "1" -> true
+      "0" -> false
     end
   end
+
+  defp convert_data({:type, :integer}, data), do: String.to_integer(data)
+
+  defp convert_data({:type, :float}, data), do: String.to_float(data)
+
+  defp convert_data({:type, :decimal}, data), do: Decimal.new(data)
+
+  defp convert_data({:type, :uri}, data), do: URI.parse(data)
+
+  defp convert_data({:type, :datetime}, data) do
+    {:ok, datetime, _offset} = DateTime.from_iso8601(data)
+    datetime
+  end
+
+  defp convert_data(attr_type, data), do: convert_data({:type, get_type(attr_type)}, data)
 
   defp to_map(%Xmlel{name: "item", children: [data]} = xmlel) when is_binary(data) do
     convert_data(Xmlel.get_attr(xmlel, "type", "string"), data)
@@ -51,6 +61,7 @@ defmodule Soap.Decode do
 
   defp to_map(%Xmlel{name: name, children: children}) do
     values = Enum.map(children, &to_map/1)
+
     if Enum.all?(values, &is_tuple/1) do
       {name, Map.new(values)}
     else
@@ -70,6 +81,7 @@ defmodule Soap.Decode do
   defp get_type("boolean"), do: :boolean
   defp get_type("XMLLiteral"), do: :xml_literal
   defp get_type("Map"), do: :map
+
   defp get_type(complex) do
     [_ns, type] = String.split(complex, ":", parts: 2)
     get_type(type)

@@ -1,10 +1,13 @@
 defmodule Soap do
+  @moduledoc """
+  SOAP data structure letting us to create a function for performing a call.
+  See `new/1`, `new/2`, and `new/3` for further details.
+  """
   defstruct namespaces: %{},
             encoding_style: "http://schemas.xmlsoap.org/soap/encoding/",
             method_namespace: nil,
             method: nil,
             arguments: []
-
 
   def new(method, arguments \\ [], namespace \\ nil) do
     %__MODULE__{method: method, arguments: arguments, method_namespace: namespace}
@@ -29,29 +32,30 @@ defmodule Soap do
 
       namespaces = Map.merge(default_ns, soap.namespaces)
       arguments = arguments_to_xmlel(soap.arguments)
+
       attrs =
         namespaces
         |> Map.new(fn {ns, uri} -> {"xmlns:#{ns}", uri} end)
         |> Map.put("soap-env:encodingStyle", soap.encoding_style)
 
       if ns = soap.method_namespace do
-        Xmlel.new("soap-env:Envelope", Map.put(attrs, "xmlns:m", ns),
-          [Xmlel.new("soap-env:Body", %{}, [
+        Xmlel.new("soap-env:Envelope", Map.put(attrs, "xmlns:m", ns), [
+          Xmlel.new("soap-env:Body", %{}, [
             Xmlel.new("m:#{soap.method}", %{}, arguments)
-          ])]
-        )
+          ])
+        ])
       else
-        Xmlel.new("soap-env:Envelope", attrs,
-          [Xmlel.new("soap-env:Body", %{}, [
+        Xmlel.new("soap-env:Envelope", attrs, [
+          Xmlel.new("soap-env:Body", %{}, [
             Xmlel.new(soap.method, %{}, arguments)
-          ])]
-        )
+          ])
+        ])
       end
     end
 
     defp arguments_to_xmlel([]), do: []
 
-    defp arguments_to_xmlel([{name, value}|rest]) do
+    defp arguments_to_xmlel([{name, value} | rest]) do
       [Xmlel.new(name, %{}, [to_string(value)]) | arguments_to_xmlel(rest)]
     end
 

@@ -30,7 +30,8 @@ defmodule SoapTest do
     end
 
     test "new with named parameters" do
-      soap = Soap.new("domainInfo", [{"IDSession", "1234abc"}, {"domain", "altenwald.com"}], "urn:DRS")
+      soap =
+        Soap.new("domainInfo", [{"IDSession", "1234abc"}, {"domain", "altenwald.com"}], "urn:DRS")
 
       assert ~x|<soap-env:Envelope xmlns:m="urn:DRS"
                                    xmlns:soap-enc="http://schemas.xmlsoap.org/soap/encoding/"

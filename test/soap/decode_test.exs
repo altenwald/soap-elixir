@@ -19,8 +19,7 @@ defmodule Soap.DecodeTest do
   end
 
   test "decode complex response" do
-    envelope =
-      ~s|<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
+    envelope = ~s|<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
                             xmlns:ns1="urn:DRS"
                             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
                             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -45,23 +44,22 @@ defmodule Soap.DecodeTest do
         </SOAP-ENV:Envelope>|
 
     assert %{
-      "contact" => %{
-        "address" => %{
-          "country" => "ES",
-          "state" => "Córdoba"
-        },
-        "bodyName" => nil,
-        "firstName" => "Manuel",
-        "idContact" => "XX123",
-        "isOwner" => "0",
-        "lastName" => "Rubio"
-      }
-    } == Soap.Decode.decode(envelope)
+             "contact" => %{
+               "address" => %{
+                 "country" => "ES",
+                 "state" => "Córdoba"
+               },
+               "bodyName" => "",
+               "firstName" => "Manuel",
+               "idContact" => "XX123",
+               "isOwner" => 0,
+               "lastName" => "Rubio"
+             }
+           } == Soap.Decode.decode(envelope)
   end
 
   test "decode item list response" do
-    envelope =
-      ~s|<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
+    envelope = ~s|<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
                             xmlns:ns1="urn:DRS"
                             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
                             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -76,14 +74,17 @@ defmodule Soap.DecodeTest do
                   <item xsi:type="xsd:string">YY123</item>
                   <item xsi:type="xsd:string">ZZ123</item>
                 </allowedIds>
-                <bannedIds/>
+                <bannedIds xsi:type="ns2:Map"/>
               </contactList>
             </ns1:contactInfoResponse>
           </SOAP-ENV:Body>
         </SOAP-ENV:Envelope>|
 
     assert %{
-      "contactList" => ~w[ XX123 YY123 ZZ123 ]
-    } == Soap.Decode.decode(envelope)
+             "contactList" => %{
+               "allowedIds" => ~w[ XX123 YY123 ZZ123 ],
+               "bannedIds" => %{}
+             }
+           } == Soap.Decode.decode(envelope)
   end
 end
