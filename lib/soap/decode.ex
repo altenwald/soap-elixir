@@ -25,7 +25,13 @@ defmodule Soap.Decode do
 
   defp convert_data({:type, :integer}, data), do: String.to_integer(data)
 
-  defp convert_data({:type, :float}, data), do: String.to_float(data)
+  defp convert_data({:type, :float}, data) do
+    if String.contains?(data, ".") do
+      String.to_float(data)
+    else
+      String.to_float(data <> ".0")
+    end
+  end
 
   defp convert_data({:type, :decimal}, data), do: Decimal.new(data)
 
@@ -89,6 +95,7 @@ defmodule Soap.Decode do
   defp get_type("boolean"), do: :boolean
   defp get_type("XMLLiteral"), do: :xml_literal
   defp get_type("Map"), do: :map
+  defp get_type("ArrayOfString"), do: :array
 
   defp get_type(complex) do
     [_ns, type] = String.split(complex, ":", parts: 2)
