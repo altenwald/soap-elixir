@@ -3,20 +3,61 @@ defmodule Soap do
   SOAP data structure letting us to create a function for performing a call.
   See `new/1`, `new/2`, and `new/3` for further details.
   """
+
+  @typedoc """
+  The information required to create the XML representation for a SOAP remote
+  call. It's composed of:
+
+  - `namespaces` a map containing the handler as key and the URL for the
+    namespace as the value.
+  - `encoding_style` is the style for encoding the SOAP message.
+  - `method_namespace` is the namespace for the current call.
+  - `method` is the method name.
+  - `arguments` is the list of arguments to be encoded to be sent
+    as part of the SOAP call.
+  """
+  @type t() :: %__MODULE__{
+          namespaces: %{namespace_name() => namespace_uri()},
+          encoding_style: namespace_uri(),
+          method_namespace: namespace_name() | nil,
+          method: method_name() | nil,
+          arguments: [argument()]
+        }
+
+  @type namespace_name() :: String.t()
+  @type namespace_uri() :: String.t()
+  @type method_name() :: String.t()
+  @type argument_name() :: String.t()
+  @type argument() ::
+          String.t() | number() | boolean() | {argument_name(), argument() | [argument()]}
+
   defstruct namespaces: %{},
             encoding_style: "http://schemas.xmlsoap.org/soap/encoding/",
             method_namespace: nil,
             method: nil,
             arguments: []
 
-  def new(method, arguments \\ [], namespace \\ nil) do
-    %__MODULE__{method: method, arguments: arguments, method_namespace: namespace}
+  @doc """
+  Creates a new SOAP call method. It's creating the structure that we could
+  use to generate a XML SOAP call.
+  """
+  @spec new(method_name(), [argument()], namespace_uri() | nil) :: t()
+  def new(method_name, arguments \\ [], namespace_uri \\ nil) do
+    %__MODULE__{method: method_name, arguments: arguments, method_namespace: namespace_uri}
   end
 
+  @doc """
+  Change the encoding style. Note that at the moment we cannot use a different
+  encoding style than `http://schemas.xmlsoap.org/soap/encoding/`.
+  """
   def set_encoding_style(soap, encoding_style) when is_binary(encoding_style) do
     %__MODULE__{soap | encoding_style: encoding_style}
   end
 
+  @doc """
+  It's adding a new namespace given the name and the URI to be added to the
+  namespaces map.
+  """
   def put_namespace(soap, name, uri) do
     %__MODULE__{soap | namespaces: Map.put(soap.namespaces, name, uri)}
   end

@@ -6,6 +6,11 @@ defmodule Soap.Decode do
   require Logger
   alias Proximal.Xmlel
 
+  @doc """
+  Decode the response for a SOAP call. It's returning the data in a
+  map form.
+  """
+  @spec decode(envelope :: String.t()) :: map()
   def decode(envelope) when is_binary(envelope) do
     Logger.debug("envelope: #{envelope}")
     [%Xmlel{children: [response]}] = Proximal.to_xmlel(envelope)["Body"]

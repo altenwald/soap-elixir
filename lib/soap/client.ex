@@ -5,6 +5,11 @@ defmodule Soap.Client do
   """
   require Logger
 
+  @doc """
+  Performs an external request using the SOAP structure passed as parameter
+  to the URL (in the first parameter).
+  """
+  @spec request(url :: String.t(), Soap.t()) :: {:ok, map()} | {:error, any()}
   def request(url, %Soap{} = soap) when is_binary(url) do
     url = to_charlist(url)
     req_headers = []
