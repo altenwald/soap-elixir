@@ -18,6 +18,20 @@ defmodule Soap.DecodeTest do
     assert Soap.Decode.decode(envelope) == %{"IDSession" => "1234abc"}
   end
 
+  test "decode error" do
+    envelope = ~s|<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+          <SOAP-ENV:Body>
+            <SOAP-ENV:Fault>
+              <faultcode>E13</faultcode>
+              <faultstring>E13 : Province : Invalid value</faultstring>
+            </SOAP-ENV:Fault>
+          </SOAP-ENV:Body>
+        </SOAP-ENV:Envelope>|
+
+    assert %{"faultcode" => "E13", "faultstring" => "E13 : Province : Invalid value"} ==
+             Soap.Decode.decode(envelope)
+  end
+
   test "decode complex response" do
     envelope = ~s|<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
                             xmlns:ns1="urn:DRS"

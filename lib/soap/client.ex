@@ -24,12 +24,14 @@ defmodule Soap.Client do
 
     Logger.debug("request: #{req_body}")
     request = {url, req_headers, content_type, req_body}
-    resp_head = {'HTTP/1.1', 200, 'OK'}
 
-    with {:ok, {^resp_head, _headers, resp_body}} <-
+    with {:ok, {{'HTTP/' ++ _, 200, 'OK'}, _headers, resp_body}} <-
            :httpc.request(:post, request, http_opts, opts),
          %{} = response <- Soap.Decode.decode(to_string(resp_body)) do
       {:ok, response}
+    else
+      {:ok, {{'HTTP/' ++ _, 500, _error}, _headers, resp_body}} ->
+        {:error, Soap.Decode.decode(to_string(resp_body))}
     end
   end
 end
