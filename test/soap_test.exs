@@ -61,5 +61,24 @@ defmodule SoapTest do
                     </soap-env:Body>
                   </soap-env:Envelope>| == Proximal.to_xmlel(soap)
     end
+
+    test "new with named and nested parameters" do
+      soap = Soap.new("contactInfo", ["1234abc", {"contact", [{"firstName", "Manuel"}, {"lastName", "Rubio"}]}], "urn:DRS")
+
+      assert ~x|<soap-env:Envelope xmlns:m="urn:DRS"
+                                   xmlns:soap-enc="http://schemas.xmlsoap.org/soap/encoding/"
+                                   xmlns:soap-env="http://schemas.xmlsoap.org/soap/envelope/"
+                                   soap-env:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+                    <soap-env:Body>
+                      <m:contactInfo>
+                        <Item>1234abc</Item>
+                        <contact>
+                          <firstName>Manuel</firstName>
+                          <lastName>Rubio</lastName>
+                        </contact>
+                      </m:contactInfo>
+                    </soap-env:Body>
+                  </soap-env:Envelope>| == Proximal.to_xmlel(soap)
+    end
   end
 end

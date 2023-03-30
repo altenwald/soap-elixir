@@ -55,6 +55,10 @@ defmodule Soap do
 
     defp arguments_to_xmlel([]), do: []
 
+    defp arguments_to_xmlel([{name, value} | rest]) when is_list(value) do
+      [Xmlel.new(name, %{}, arguments_to_xmlel(value)) | arguments_to_xmlel(rest)]
+    end
+
     defp arguments_to_xmlel([{name, value} | rest]) do
       [Xmlel.new(name, %{}, [to_string(value)]) | arguments_to_xmlel(rest)]
     end
