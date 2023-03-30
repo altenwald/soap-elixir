@@ -63,7 +63,12 @@ defmodule SoapTest do
     end
 
     test "new with named and nested parameters" do
-      soap = Soap.new("contactInfo", ["1234abc", {"contact", [{"firstName", "Manuel"}, {"lastName", "Rubio"}]}], "urn:DRS")
+      soap =
+        Soap.new(
+          "contactInfo",
+          ["1234abc", {"contact", [{"firstName", "Manuel"}, {"lastName", "Rubio"}]}],
+          "urn:DRS"
+        )
 
       assert ~x|<soap-env:Envelope xmlns:m="urn:DRS"
                                    xmlns:soap-enc="http://schemas.xmlsoap.org/soap/encoding/"
