@@ -13,7 +13,7 @@ defmodule Soap.Client do
   def request(url, %Soap{} = soap) when is_binary(url) do
     url = to_charlist(url)
     req_headers = []
-    content_type = 'text/xml'
+    content_type = 'text/xml; charset=utf-8'
     http_opts = []
     opts = []
 
@@ -21,6 +21,7 @@ defmodule Soap.Client do
       soap
       |> Proximal.to_xmlel()
       |> to_string()
+      |> String.replace_prefix("", ~s|<?xml version="1.0" encoding="UTF-8"?>|)
 
     Logger.debug("request: #{req_body}")
     request = {url, req_headers, content_type, req_body}
