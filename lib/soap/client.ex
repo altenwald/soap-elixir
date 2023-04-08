@@ -31,6 +31,9 @@ defmodule Soap.Client do
          %{} = response <- Soap.Decode.decode(to_string(resp_body)) do
       {:ok, response}
     else
+      {:error, _} = error ->
+        error
+
       {:ok, {{'HTTP/' ++ _, 500, _error}, _headers, resp_body}} ->
         {:error, Soap.Decode.decode(to_string(resp_body))}
     end
