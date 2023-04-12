@@ -119,5 +119,9 @@ defmodule Soap do
     defp arguments_to_xmlel([value | rest]) when not is_map(value) and not is_list(value) do
       [Xmlel.new("Item", %{}, [to_string(value)]) | arguments_to_xmlel(rest)]
     end
+
+    defp arguments_to_xmlel([values | rest]) when is_list(values) do
+      [Xmlel.new("Item", %{}, arguments_to_xmlel(values)) | arguments_to_xmlel(rest)]
+    end
   end
 end
