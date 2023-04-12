@@ -12,7 +12,7 @@ defmodule Soap.Client do
   @spec request(url :: String.t(), Soap.t()) :: {:ok, map()} | {:error, any()}
   def request(url, %Soap{} = soap) when is_binary(url) do
     url = to_charlist(url)
-    req_headers = []
+    req_headers = [{'SOAPAction', to_charlist(soap.soap_action)}]
     content_type = 'text/xml; charset=utf-8'
     http_opts = []
     opts = []

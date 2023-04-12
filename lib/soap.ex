@@ -13,6 +13,7 @@ defmodule Soap do
   - `encoding_style` is the style for encoding the SOAP message.
   - `method_namespace` is the namespace for the current call.
   - `method` is the method name.
+  - `soap_action` is the SOAPAction header.
   - `arguments` is the list of arguments to be encoded to be sent
     as part of the SOAP call.
   """
@@ -21,12 +22,14 @@ defmodule Soap do
           encoding_style: namespace_uri(),
           method_namespace: namespace_name() | nil,
           method: method_name() | nil,
+          soap_action: soap_action() | nil,
           arguments: [argument()]
         }
 
   @type namespace_name() :: String.t()
   @type namespace_uri() :: String.t()
   @type method_name() :: String.t()
+  @type soap_action() :: String.t()
   @type argument_name() :: String.t()
   @type argument() ::
           String.t() | number() | boolean() | {argument_name(), argument() | [argument()]}
@@ -35,6 +38,7 @@ defmodule Soap do
             encoding_style: "http://schemas.xmlsoap.org/soap/encoding/",
             method_namespace: nil,
             method: nil,
+            soap_action: nil,
             arguments: []
 
   @doc """
@@ -52,6 +56,14 @@ defmodule Soap do
   """
   def set_encoding_style(soap, encoding_style) when is_binary(encoding_style) do
     %__MODULE__{soap | encoding_style: encoding_style}
+  end
+
+  @doc """
+  Set the SOAPAction header. Note that this is an optional data and it's not
+  compulsory to be filled.
+  """
+  def set_soap_action(soap, soap_action) when is_binary(soap_action) do
+    %__MODULE__{soap | soap_action: soap_action}
   end
 
   @doc """
