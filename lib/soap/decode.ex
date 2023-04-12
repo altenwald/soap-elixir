@@ -49,11 +49,18 @@ defmodule Soap.Decode do
 
   defp convert_data(attr_type, data), do: convert_data({:type, get_type(attr_type)}, data)
 
-  defp to_map(%Xmlel{name: "item", children: [data]} = xmlel) when is_binary(data) do
+  defguardp item?(name)
+            when binary_part(name, 0, 1) in ~w[ i I ] and
+                   binary_part(name, 1, 1) in ~w[ t T ] and
+                   binary_part(name, 2, 1) in ~w[ e E ] and
+                   binary_part(name, 3, 1) in ~w[ m M ]
+
+  defp to_map(%Xmlel{name: name, children: [data]} = xmlel)
+       when is_binary(data) and item?(name) do
     convert_data(Xmlel.get_attr(xmlel, "type", "string"), data)
   end
 
-  defp to_map(%Xmlel{name: "item", children: children}) do
+  defp to_map(%Xmlel{name: name, children: children}) when item?(name) do
     values = Enum.map(children, &to_map/1)
 
     if Enum.all?(values, &is_tuple/1) do

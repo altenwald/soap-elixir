@@ -208,9 +208,9 @@ defmodule Soap.DecodeTest do
             <ns1:contactInfoResponse>
               <contactList xsi:type="ns1:StructContactReturn">
                 <allowedIds>
-                  <item xsi:type="xsd:string">XX123</item>
-                  <item xsi:type="xsd:string">YY123</item>
-                  <item xsi:type="xsd:string">ZZ123</item>
+                  <Item xsi:type="xsd:string">XX123</Item>
+                  <Item xsi:type="xsd:string">YY123</Item>
+                  <Item xsi:type="xsd:string">ZZ123</Item>
                 </allowedIds>
                 <bannedIds xsi:type="ns2:Map"/>
               </contactList>
