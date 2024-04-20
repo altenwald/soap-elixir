@@ -80,7 +80,9 @@ defmodule Soap do
     def to_xmlel(%Soap{} = soap) do
       default_ns = %{
         "soap-env" => "http://schemas.xmlsoap.org/soap/envelope/",
-        "soap-enc" => "http://schemas.xmlsoap.org/soap/encoding/"
+        "soap-enc" => "http://schemas.xmlsoap.org/soap/encoding/",
+        "xsi" => "http://www.w3.org/2001/XMLSchema-instance",
+        "xsd" => "http://www.w3.org/2001/XMLSchema"
       }
 
       namespaces = Map.merge(default_ns, soap.namespaces)
@@ -112,12 +114,29 @@ defmodule Soap do
       [Xmlel.new(name, %{}, arguments_to_xmlel(value)) | arguments_to_xmlel(rest)]
     end
 
+    defp arguments_to_xmlel([{name, value} | rest]) when is_integer(value) do
+      [Xmlel.new(name, %{"xsi:type" => "xsd:int"}, [to_string(value)]) | arguments_to_xmlel(rest)]
+    end
+
     defp arguments_to_xmlel([{name, value} | rest]) do
-      [Xmlel.new(name, %{}, [to_string(value)]) | arguments_to_xmlel(rest)]
+      [
+        Xmlel.new(name, %{"xsi:type" => "xsd:string"}, [to_string(value)])
+        | arguments_to_xmlel(rest)
+      ]
+    end
+
+    defp arguments_to_xmlel([value | rest]) when is_integer(value) do
+      [
+        Xmlel.new("Item", %{"xsi:type" => "xsd:int"}, [to_string(value)])
+        | arguments_to_xmlel(rest)
+      ]
     end
 
     defp arguments_to_xmlel([value | rest]) when not is_map(value) and not is_list(value) do
-      [Xmlel.new("Item", %{}, [to_string(value)]) | arguments_to_xmlel(rest)]
+      [
+        Xmlel.new("Item", %{"xsi:type" => "xsd:string"}, [to_string(value)])
+        | arguments_to_xmlel(rest)
+      ]
     end
 
     defp arguments_to_xmlel([values | rest]) when is_list(values) do
