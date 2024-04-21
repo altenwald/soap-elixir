@@ -110,7 +110,13 @@ defmodule Soap.Decode do
   defp get_type("ArrayOfString"), do: :array
 
   defp get_type(complex) do
-    [_ns, type] = String.split(complex, ":", parts: 2)
-    get_type(type)
+    case String.split(complex, ":", parts: 2) do
+      [_ns, type] ->
+        get_type(type)
+
+      [_type] ->
+        # TODO handle custom types
+        :array
+    end
   end
 end
