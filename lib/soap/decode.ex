@@ -82,6 +82,7 @@ defmodule Soap.Decode do
       {_, :boolean} -> {name, false}
       {_, :integer} -> {name, 0}
       {_, :map} -> {name, %{}}
+      {_, :array} -> {name, []}
     end
   end
 
