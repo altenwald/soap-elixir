@@ -14,7 +14,14 @@ defmodule Soap.Decode do
   def decode(envelope) when is_binary(envelope) do
     Logger.debug("envelope: #{envelope}")
     [%Xmlel{children: [response]}] = Proximal.to_xmlel(envelope)["Body"]
-    Map.new(response.children, &to_map/1)
+
+    values = Enum.map(response.children, &to_map/1)
+
+    if Enum.all?(values, &is_tuple/1) do
+      Map.new(values)
+    else
+      values
+    end
   end
 
   defp convert_data({:type, :string}, data), do: data

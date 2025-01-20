@@ -225,4 +225,24 @@ defmodule Soap.DecodeTest do
              }
            } == Soap.Decode.decode(envelope)
   end
+
+  test "decode item list request" do
+    envelope = ~s|<?xml version="1.0" encoding="UTF-8"?>
+                  <soap-env:Envelope xmlns:m="urn:DRS"
+                                     xmlns:soap-enc="http://schemas.xmlsoap.org/soap/encoding/"
+                                     xmlns:soap-env="http://schemas.xmlsoap.org/soap/envelope/"
+                                     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                                     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                                     soap-env:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+                    <soap-env:Body>
+                      <m:sessionOpen>
+                        <Item xsi:type="xsd:string">NETIMUSER</Item>
+                        <Item xsi:type="xsd:string">NETIMPASS</Item>
+                        <Item xsi:type="xsd:string">EN</Item>
+                      </m:sessionOpen>
+                    </soap-env:Body>
+                  </soap-env:Envelope>|
+
+    assert ["NETIMUSER", "NETIMPASS", "EN"] == Soap.Decode.decode(envelope)
+  end
 end
