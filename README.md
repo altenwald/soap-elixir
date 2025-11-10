@@ -10,7 +10,7 @@ It's still not available for hex, so you can install it this way:
 ```elixir
 def deps do
   [
-    {:soap, github: "altenwald/soap"}
+    {:soap, github: "altenwald/soap-elixir"}
   ]
 end
 ```
