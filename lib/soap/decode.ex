@@ -82,17 +82,9 @@ defmodule Soap.Decode do
   end
 
   defp to_map(%Xmlel{name: name, children: []} = xmlel) do
-    case {Xmlel.get_attr(xmlel, "nil"), get_type(Xmlel.get_attr(xmlel, "type"))} do
-      {"true", _} -> {name, nil}
-      {_, nil} -> {name, nil}
-      {_, :string} -> {name, ""}
-      {_, :boolean} -> {name, false}
-      {_, :integer} -> {name, 0}
-      {_, :float} -> {name, 0.0}
-      {_, :decimal} -> {name, Decimal.new("0.0")}
-      {_, :map} -> {name, %{}}
-      {_, :array} -> {name, []}
-    end
+    nil? = Xmlel.get_attr(xmlel, "nil") == "true"
+    type = get_type(Xmlel.get_attr(xmlel, "type"))
+    {name, to_map(nil?, type)}
   end
 
   defp to_map(%Xmlel{name: name, children: children}) do
@@ -104,6 +96,16 @@ defmodule Soap.Decode do
       {name, values}
     end
   end
+
+  defp to_map(true = _nil?, _), do: nil
+  defp to_map(_nil?, nil), do: nil
+  defp to_map(_nil?, :string), do: ""
+  defp to_map(_nil?, :boolean), do: false
+  defp to_map(_nil?, :integer), do: 0
+  defp to_map(_nil?, :float), do: 0.0
+  defp to_map(_nil?, :decimal), do: Decimal.new("0.0")
+  defp to_map(_nil?, :map), do: %{}
+  defp to_map(_nil?, :array), do: []
 
   defp get_type(nil), do: nil
   defp get_type("string"), do: :string
