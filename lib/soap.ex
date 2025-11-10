@@ -118,6 +118,14 @@ defmodule Soap do
       [Xmlel.new(name, %{"xsi:type" => "xsd:int"}, [to_string(value)]) | arguments_to_xmlel(rest)]
     end
 
+    defp arguments_to_xmlel([{name, value} | rest]) when is_float(value) do
+      [Xmlel.new(name, %{"xsi:type" => "xsd:double"}, [to_string(value)]) | arguments_to_xmlel(rest)]
+    end
+
+    defp arguments_to_xmlel([{name, value} | rest]) when is_struct(value, Decimal) do
+      [Xmlel.new(name, %{"xsi:type" => "xsd:decimal"}, [to_string(value)]) | arguments_to_xmlel(rest)]
+    end
+
     defp arguments_to_xmlel([{name, value} | rest]) do
       [
         Xmlel.new(name, %{"xsi:type" => "xsd:string"}, [to_string(value)])

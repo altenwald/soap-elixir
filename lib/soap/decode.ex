@@ -88,6 +88,8 @@ defmodule Soap.Decode do
       {_, :string} -> {name, ""}
       {_, :boolean} -> {name, false}
       {_, :integer} -> {name, 0}
+      {_, :float} -> {name, 0.0}
+      {_, :decimal} -> {name, Decimal.new("0.0")}
       {_, :map} -> {name, %{}}
       {_, :array} -> {name, []}
     end
