@@ -85,7 +85,9 @@ defmodule Soap do
         "xsd" => "http://www.w3.org/2001/XMLSchema"
       }
 
-      namespaces = Map.merge(default_ns, soap.namespaces)
+      # Collect any extra xmlns a Soap.Argument implementation needs.
+      argument_ns = collect_namespaces(soap.arguments)
+      namespaces = default_ns |> Map.merge(argument_ns) |> Map.merge(soap.namespaces)
       arguments = arguments_to_xmlel(soap.arguments)
 
       attrs =
@@ -108,6 +110,17 @@ defmodule Soap do
       end
     end
 
+    defp collect_namespaces(arguments) do
+      Enum.reduce(arguments, %{}, fn argument, acc ->
+        Map.merge(acc, argument_namespaces(argument))
+      end)
+    end
+
+    defp argument_namespaces({_name, value}), do: argument_namespaces(value)
+    defp argument_namespaces(value) when is_list(value), do: collect_namespaces(value)
+    defp argument_namespaces(value) when is_struct(value), do: Soap.Argument.namespaces(value)
+    defp argument_namespaces(_value), do: %{}
+
     defp arguments_to_xmlel([]), do: []
 
     defp arguments_to_xmlel([{name, value} | rest]) when is_list(value) do
@@ -124,6 +137,11 @@ defmodule Soap do
 
     defp arguments_to_xmlel([{name, value} | rest]) when is_struct(value, Decimal) do
       [Xmlel.new(name, %{"xsi:type" => "xsd:decimal"}, [to_string(value)]) | arguments_to_xmlel(rest)]
+    end
+
+    # Any other struct is encoded through the Soap.Argument protocol.
+    defp arguments_to_xmlel([{name, value} | rest]) when is_struct(value) do
+      [Soap.Argument.to_xmlel(value, name) | arguments_to_xmlel(rest)]
     end
 
     defp arguments_to_xmlel([{name, value} | rest]) do

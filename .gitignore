@@ -24,3 +24,6 @@ soap-*.tar
 
 # Temporary files, for example, from tests.
 /tmp/
+
+# ElixirLS cache.
+/.elixir_ls/
